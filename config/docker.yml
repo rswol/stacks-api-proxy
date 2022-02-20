@@ -1,10 +1,13 @@
-kong: http://kong:8001
+# list of Stacks API Node endpoints, the endpoint must be reachable by "http://" protocol:
 endpoints:
   - stacks-api.stacksdata.info:3999
-  - 100.109.89.58:4999
 
+# The hostname for gateway, all requests must specify this host to be routed to the backend
+# e.g http://localhost:8000/extended/v1/block
 frontendHostname: localhost
 proxyPath: /
+
+kong: http://kong:8001
 
 # Logging settings.
 server:
