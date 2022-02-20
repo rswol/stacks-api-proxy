@@ -2,7 +2,6 @@ package com.stacksonchain.core;
 
 import com.stacksonchain.StacksApiProxyConfiguration;
 import com.stacksonchain.ext.KongApiClient;
-import com.stacksonchain.ext.KongNotFoundException;
 import com.stacksonchain.ext.Plugin;
 import com.stacksonchain.ext.Route;
 import com.stacksonchain.ext.Service;

@@ -1,0 +1,16 @@
+kong: http://localhost:8001
+endpoints:
+  - stacks-api.stacksdata.info:3999
+  - 100.109.89.58:4999
+
+frontendHostname: frontend1
+proxyPath: /
+
+logging:
+  # The default level of all loggers. Can be OFF, ERROR, WARN, INFO, DEBUG, TRACE, or ALL.
+  level: INFO
+  # Logger-specific levels.
+  loggers:
+    com.stacksonchain: DEBUG
+  appenders:
+    - type: console

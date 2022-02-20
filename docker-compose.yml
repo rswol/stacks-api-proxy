@@ -1,0 +1,73 @@
+version: '3.9'
+services:
+  kong-database:
+    restart: always
+    image: "postgres:9.6-alpine"
+    shm_size: 1g
+    environment:
+      POSTGRES_USER: kong
+      POSTGRES_PASSWORD: kong
+      POSTGRES_DB: kong
+      POSTGRES_PORT: 5432
+    networks:
+      - backend
+  kong-migrations:
+    image: "${KONG_DOCKER_TAG:-kong:latest}"
+    command: kong migrations bootstrap
+    depends_on:
+      - kong-database
+    environment:
+      KONG_DATABASE: "postgres"
+      KONG_PG_HOST: "kong-database"
+      KONG_PG_USER: "kong"
+      KONG_PG_PASSWORD: "kong"
+    networks:
+      - backend
+    restart: on-failure
+  kong:
+    image: "${KONG_DOCKER_TAG:-kong:latest}"
+    user: "${KONG_USER:-root}"
+    ports:
+      - "8000:8000"
+      - "8001:8001"
+    networks:
+      - backend
+    depends_on:
+      - kong-database
+    environment:
+      KONG_DATABASE: "postgres"
+      KONG_PG_HOST: "kong-database"
+      KONG_PG_USER: "kong"
+      KONG_PG_PASSWORD: "kong"
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ERROR_LOG: /dev/stderr
+      KONG_PROXY_LISTEN: "${KONG_PROXY_LISTEN:-0.0.0.0:8000}"
+      KONG_ADMIN_LISTEN: "${KONG_ADMIN_LISTEN:-0.0.0.0:8001}"
+      KONG_PROXY_ACCESS_LOG: /dev/stdout
+      KONG_PROXY_ERROR_LOG: /dev/stderr
+      KONG_PREFIX: /var/run/kong
+    volumes:
+      - ./run/kong:/var/run/kong:Z
+    healthcheck:
+      test: [ "CMD", "kong", "health" ]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    restart: on-failure:5
+
+  proxy:
+    image: "stacks-api-proxy:latest"
+    restart: always
+    ports:
+      - "8088:8080"
+      - "8089:8081"
+    volumes:
+      - ./run/proxy:/logs
+      - ./config:/opt/stacks-api-proxy/config/
+    networks:
+      - backend
+    depends_on:
+      - kong
+
+networks:
+  backend:

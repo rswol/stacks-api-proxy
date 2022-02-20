@@ -1,0 +1,56 @@
+kong: http://kong:8001
+endpoints:
+  - stacks-api.stacksdata.info:3999
+  - 100.109.89.58:4999
+
+frontendHostname: localhost
+proxyPath: /
+
+# Logging settings.
+server:
+  applicationConnectors:
+    - type: http
+      useForwardedHeaders: true
+
+  requestLog:
+    appenders:
+      - type: console
+
+      - type: file
+        currentLogFilename: /logs/request.log
+        archivedLogFilenamePattern: /logs/request-%d{yyyy-MM-dd}-%i.log.gz
+        archivedFileCount: 7
+        timeZone: UTC
+        maxFileSize: 10MiB
+        threshold: INFO
+        layout:
+          type: access-json
+
+logging:
+  # The default level of all loggers. Can be OFF, ERROR, WARN, INFO, DEBUG, TRACE, or ALL.
+  level: INFO
+  # Logger-specific levels.
+  loggers:
+    com.stacksonchain: DEBUG
+  appenders:
+    - type: console
+
+    - type: file
+      threshold: INFO
+      # logFormat: "%-6level [%d{HH:mm:ss.SSS}] [%t] %logger{5} - %X{code} %msg %n"
+      currentLogFilename: /logs/application.log
+      archivedLogFilenamePattern: /logs/application-%d{yyyy-MM-dd}-%i.log.gz
+      archivedFileCount: 7
+      timeZone: UTC
+      maxFileSize: 10MiB
+      layout:
+        type: json
+        timestampFormat: "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+        includes:
+          - level
+          - mdc
+          - loggerName
+          - message
+          - exception
+          - timestamp
+          - callerData
