@@ -1,7 +1,10 @@
+referenceApiNodes:
+  - https://stacks-node-api.mainnet.stacks.co
+  - https://mainnet.syvita.org
+
 kong: http://localhost:8001
 endpoints:
   - stacks-api.stacksdata.info:3999
-  - 100.109.89.58:4999
 
 frontendHostname: frontend1
 proxyPath: /

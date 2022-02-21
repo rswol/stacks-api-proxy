@@ -17,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class StacksApiHealthCheck {
 
-  enum Status { HEALTHY, UNHEALTHY };
+  enum Status {HEALTHY, UNHEALTHY};
 
   final StacksApiProxyConfiguration configuration;
   final Function<String, StacksApiClient> apiClient;
@@ -27,14 +27,15 @@ public class StacksApiHealthCheck {
 
   long maxBlockHeight = 48000;
 
-  final String mainStacksApiEndpoint = "https://stacks-node-api.mainnet.stacks.co";
-
   public void start() {
-    for (var url: configuration.endpoints) {
+    for (var url : configuration.endpoints) {
       state.put(url, Status.UNHEALTHY);
     }
 
+    // polling undrerlying backend endpoints every 10 seconds
     scheduler.scheduleWithFixedDelay(this::poll, 10, 10, TimeUnit.SECONDS);
+    // polling main reference endpoints (like https://stacks-node-api.mainnet.stacks.co)
+    // every 2 minutes
     scheduler.scheduleWithFixedDelay(this::setMaxBlockHeight, 2, 2, TimeUnit.MINUTES);
     log.info("Initial poll");
     setMaxBlockHeight();
@@ -49,11 +50,12 @@ public class StacksApiHealthCheck {
   }
 
   void poll() {
-    for (var url: state.keySet()) {
+    for (var url : state.keySet()) {
       try {
         var info = apiClient.apply(String.format("http://%s", url)).info();
-        var status = info.getStacksTipHeight() >= maxBlockHeight ?
-            Status.HEALTHY : Status.UNHEALTHY;
+        var status =
+            info.getStacksTipHeight() >= (maxBlockHeight - configuration.driftTolerance) ?
+                Status.HEALTHY : Status.UNHEALTHY;
         log.info("Marking {} as {}, block {}", url, status, info.getStacksTipHeight());
         maxBlockHeight = Math.max(info.getStacksTipHeight(), maxBlockHeight);
         state.put(url, status);
@@ -65,12 +67,19 @@ public class StacksApiHealthCheck {
   }
 
   void setMaxBlockHeight() {
-    try {
-      var info = apiClient.apply(mainStacksApiEndpoint).info();
-      maxBlockHeight = Math.max(info.getStacksTipHeight(), maxBlockHeight);
-      log.info("Max block height: {}", maxBlockHeight);
-    } catch (Exception ex) {
-      log.warn("Failed to poll {} for block height {}", mainStacksApiEndpoint, ex.getMessage());
+    var maxBlockSet = false;
+    for (var ref : configuration.referenceApiNodes) {
+      try {
+        var info = apiClient.apply(ref).info();
+        maxBlockHeight = Math.max(info.getStacksTipHeight(), maxBlockHeight);
+        maxBlockSet = true;
+        log.info("Max block height: {}", maxBlockHeight);
+      } catch (Exception ex) {
+        log.warn("Failed to poll {} for block height {}", ref, ex.getMessage());
+      }
+    }
+    if (!maxBlockSet) {
+      log.warn("None of main reference endpoints responded, drift cannot be detected");
     }
   }
 }

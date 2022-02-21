@@ -1,3 +1,12 @@
+# main reference endpoints for fetching current Stacks block height
+# polled every 2 minutes
+referenceApiNodes:
+  - https://stacks-node-api.mainnet.stacks.co
+  - https://mainnet.syvita.org
+
+# maximum number of blocks backend is allowed to fall behind
+driftTolerance: 1
+
 # list of Stacks API Node endpoints, the endpoint must be reachable by "http://" protocol:
 endpoints:
   - stacks-api.stacksdata.info:3999

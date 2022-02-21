@@ -10,6 +10,9 @@ import javax.validation.constraints.*;
 public class StacksApiProxyConfiguration extends Configuration {
 
   @NotNull
+  public List<String> referenceApiNodes;
+
+  @NotNull
   public List<String> endpoints;
 
   @NotNull
@@ -20,4 +23,6 @@ public class StacksApiProxyConfiguration extends Configuration {
 
   @NotNull
   public String frontendHostname;
+
+  public int driftTolerance = 1;
 }
