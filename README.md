@@ -33,9 +33,20 @@ $ curl http://localhost:8000/extended/v1/block
 {"message":"Unauthorized"}           
 ```
 
+To obtain list of users with JWTs call proxy:
+```bash
+$ curl http://localhost:8088/v1/users
+```
+
 To obtain JWT for "stacks" call proxy:
 ```bash
 $ curl -X POST -H "Content-Type: application/json" \ 
+      -d '{"user": "stacks"}' http://localhost:8088/v1/jwt
+```
+
+To delete JWT for "stacks" call proxy:
+```bash
+$ curl -X DELETE -H "Content-Type: application/json" \ 
       -d '{"user": "stacks"}' http://localhost:8088/v1/jwt
 ```
 

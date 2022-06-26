@@ -4,6 +4,8 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.stacksonchain.ext.KongApiClient;
 import com.stacksonchain.ext.KongNotFoundException;
+import com.stacksonchain.ext.User;
+import java.util.List;
 import javax.inject.Inject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +25,13 @@ public class JwtMaker {
     }
   }
 
+  public List<String> listUsers() {
+    return kong.listUsers()
+        .stream()
+        .map(User::getUsername)
+        .toList();
+  }
+
   public String userJwt(String username) {
     var userId = ensureUser(username);
     var credentials = kong.listJwtCredentials(userId);
@@ -33,6 +42,14 @@ public class JwtMaker {
     return createJwt(credential.getSecret(), credential.getKey());
   }
 
+  public void deleteUserJwt(String username) {
+    var userId = ensureUser(username);
+    var credentials = kong.listJwtCredentials(userId);
+    if (!credentials.isEmpty()) {
+      kong.deleteJwtCredential(username, credentials.get(0).getId());
+    }
+  }
+
   String createJwt(String secret, String key) {
     var algorithm = Algorithm.HMAC256(secret);
     var jwt = JWT.create()
@@ -41,5 +58,4 @@ public class JwtMaker {
         .sign(algorithm);
     return jwt;
   }
-
 }

@@ -115,6 +115,11 @@ public class KongApiClient {
         JwtCredential.class);
   }
 
+  public void deleteJwtCredential(String username, String id) {
+    delete(
+        buildPath("consumers", username, "jwt", id));
+  }
+
   public List<JwtCredential> listJwtCredentials(String username) {
     return list(buildPath("consumers", username, "jwt"),
         new TypeReference<KongResponse<JwtCredential>>() {
