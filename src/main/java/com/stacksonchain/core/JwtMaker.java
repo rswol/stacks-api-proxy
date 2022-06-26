@@ -28,6 +28,10 @@ public class JwtMaker {
   public List<String> listUsers() {
     return kong.listUsers()
         .stream()
+        .filter(user -> {
+          var creds = kong.listJwtCredentials(user.getId());
+          return !creds.isEmpty();
+        })
         .map(User::getUsername)
         .toList();
   }
