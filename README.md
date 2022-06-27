@@ -59,7 +59,7 @@ $ curl -X POST http://localhost:8088/v1/authOff
 How to start the stacks-api-proxy application
 ---
 
-1. Run `mvn clean install` to build proxy jar
+1. Run `mvn package -Dmaven.test.skip=true` to build proxy jar
 2. Run `docker build . -f Dockerfile -t stacks-api-proxy` to create a docker image
 3. Edit `config/docker.yml` to add your Stacks API Node endpoints
 4. Start application with `docker-compose up`
