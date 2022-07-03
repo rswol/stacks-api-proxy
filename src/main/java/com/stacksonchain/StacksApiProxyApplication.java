@@ -39,6 +39,9 @@ public class StacksApiProxyApplication extends Application<StacksApiProxyConfigu
 
 
         var kong = injector.getInstance(KongApiClient.class);
+
+        kong.waitTillAlive();
+
         log.info("current upstreams: {}", kong.upstreams());
 
         var health = injector.getInstance(StacksApiHealthCheck.class);

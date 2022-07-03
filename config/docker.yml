@@ -2,7 +2,6 @@
 # polled every 2 minutes
 referenceApiNodes:
   - https://stacks-node-api.mainnet.stacks.co
-  - https://mainnet.syvita.org
 
 # maximum number of blocks backend is allowed to fall behind
 driftTolerance: 1

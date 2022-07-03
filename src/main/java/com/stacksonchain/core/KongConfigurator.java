@@ -106,6 +106,16 @@ public class KongConfigurator {
     return kong.createRoute(serviceName, configuration.frontendHostname);
   }
 
+
+  public boolean isAuth() {
+    for (var plugin : kong.listPlugins(serviceName)) {
+      if ("jwt".equals(plugin.getName())) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   public Plugin authOn() {
     for (var plugin : kong.listPlugins(serviceName)) {
       if ("jwt".equals(plugin.getName())) {

@@ -69,5 +69,24 @@ services:
     depends_on:
       - kong
 
+  proxy-ui:
+    image: "stacks-api-proxy-ui:latest"
+    restart: always
+    networks:
+      - backend
+    depends_on:
+      - proxy
+
+  proxy-nginx:
+    image: "stacks-api-proxy-nginx:latest"
+    restart: always
+    ports:
+      - "3000:80"
+    networks:
+      - backend
+    depends_on:
+      - proxy-ui
+      - proxy
+
 networks:
   backend:

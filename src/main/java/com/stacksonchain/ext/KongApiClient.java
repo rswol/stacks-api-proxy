@@ -27,6 +27,19 @@ public class KongApiClient {
 
   HttpClient httpClient = HttpClient.newHttpClient();
 
+  @SneakyThrows
+  public void waitTillAlive() {
+    while (true) {
+      try {
+        upstreams();
+        break;
+      } catch (Exception ex) {
+        log.warn("Kong is not alive yet, waiting... {}", ex.getMessage());
+      }
+      Thread.sleep(3000);
+    }
+  }
+
   public List<Upstream> upstreams() {
     return list(buildPath("upstreams"), new TypeReference<KongResponse<Upstream>>() {});
   }

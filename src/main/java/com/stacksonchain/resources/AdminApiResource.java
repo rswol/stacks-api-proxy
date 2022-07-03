@@ -51,6 +51,12 @@ public class AdminApiResource {
     return "ok";
   }
 
+  @GET
+  @Path("/isAuth")
+  public Boolean isAuth() {
+    return kong.isAuth();
+  }
+
   @POST
   @Path("/authOff")
   public String authOff() {
